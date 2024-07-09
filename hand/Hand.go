@@ -38,8 +38,20 @@ func NewDealer() Dealer {
 	}
 }
 
-// Adds a card from a deck of cards to the hand; removes
-// the card from the deck to avoid repetition
+type ConfigDealerOpts struct {
+	isFinalHand bool
+}
+
+type ConfigDealerOptsFunc func(dealerOpts *ConfigDealerOpts)
+
+func IsFinalHand() ConfigDealerOptsFunc {
+	return func(dealerOpts *ConfigDealerOpts) {
+		dealerOpts.isFinalHand = true
+	}
+}
+
+// Adds a card from a deck of cards to a hand;
+// removes card from deck to avoid repetition
 func (h *BasicHand) AddCard(deckOfCards *[]deck.Card) error {
 	if len(*deckOfCards) == 0 {
 		return fmt.Errorf("the deck is empty")
@@ -72,21 +84,31 @@ func (h *BasicHand) UpdateScore() {
 	}
 }
 
-// Displays the player hand. All cards are always revealed.
+// Displays player hand.
+// Cards are always revealed.
 func (p *Player) DisplayHand() {
 	fmt.Println("Player's Cards:")
 	for _, card := range p.Cards {
 		fmt.Printf("%s ", card)
 	}
 	fmt.Println()
+	fmt.Println()
 }
 
-// Displays the dealer's hand. The second card remains hidden
-// until the final hand, where all the dealer's cards are revealed
-func (d *Dealer) DisplayHand(isFinalHand bool) {
+// Displays dealer's hand. Second card remains hidden
+// until the final hand, where all cards are revealed
+func (d *Dealer) DisplayHand(opts ...ConfigDealerOptsFunc) {
+	defConfig := &ConfigDealerOpts{
+		isFinalHand: false,
+	}
+
+	for _, opt := range opts {
+		opt(defConfig)
+	}
+
 	fmt.Println("Dealer's Cards:")
 	for i := 0; i < len(d.Cards); i++ {
-		if i == 1 && !isFinalHand {
+		if i == 1 && !defConfig.isFinalHand {
 			fmt.Printf("Hidden Card\n")
 		} else {
 			fmt.Printf("%s ", d.Cards[i])

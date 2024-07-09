@@ -23,5 +23,8 @@ func main() {
 	dealerHand.AddCard(&deck)
 
 	playerHand.DisplayHand()
-	dealerHand.DisplayHand(true)
+	dealerHand.DisplayHand()
+
+	playerHand.DisplayHand()
+	dealerHand.DisplayHand(hand.IsFinalHand())
 }
