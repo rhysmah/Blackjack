@@ -5,8 +5,6 @@ import (
 	"fmt"
 )
 
-// Add configOpts via functional options for clearer configurations
-
 type BasicHand struct {
 	Cards  []deck.Card
 	Points int
