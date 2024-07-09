@@ -3,21 +3,28 @@ package main
 import (
 	"blackjack/deck"
 	"blackjack/hand"
-	"fmt"
 )
+
+// TODO: Create gameplay loop
 
 func main() {
 
-	deck := deck.New(deck.WithSort(deck.SortByValue))
-	hand := hand.New()
+	deck := deck.New(deck.WithShuffle())
 
-	fmt.Println(deck)
-	fmt.Println(hand.Points)
+	playerHand := hand.New(false)
+	dealerHand := hand.New(true)
 
-	hand.AddCard(&deck)
-	hand.AddCard(&deck)
-	hand.UpdateScore()
+	// Round 1
+	playerHand.AddCard(&deck)
+	dealerHand.AddCard(&deck)
 
-	fmt.Println(hand.Cards)
-	fmt.Println(hand.Points)
+	// Round 2
+	playerHand.AddCard(&deck)
+	dealerHand.AddCard(&deck)
+
+	playerHand.DisplayPlayerHand()
+	dealerHand.DisplayDealerHand(false)
+
+	playerHand.DisplayPlayerHand()
+	dealerHand.DisplayDealerHand(true)
 }
