@@ -11,8 +11,8 @@ func main() {
 
 	deck := deck.New(deck.WithShuffle())
 
-	playerHand := hand.New(false)
-	dealerHand := hand.New(true)
+	playerHand := hand.NewPlayer()
+	dealerHand := hand.NewDealer()
 
 	// Round 1
 	playerHand.AddCard(&deck)
@@ -22,9 +22,6 @@ func main() {
 	playerHand.AddCard(&deck)
 	dealerHand.AddCard(&deck)
 
-	playerHand.DisplayPlayerHand()
-	dealerHand.DisplayDealerHand(false)
-
-	playerHand.DisplayPlayerHand()
-	dealerHand.DisplayDealerHand(true)
+	playerHand.DisplayHand()
+	dealerHand.DisplayHand(true)
 }

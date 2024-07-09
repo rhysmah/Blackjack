@@ -5,31 +5,42 @@ import (
 	"fmt"
 )
 
-// TODO: Create Player and Dealer interfaces that only allow
-// particular types to use particular methods. For example, the
-// Player should not have access to the DisplayDealerHand()
+// Add configOpts via functional options for clearer configurations
 
-// Represents a hand of cards in a Blackjack game
-type Hand struct {
-	Cards    []deck.Card
-	Points   int
-	isDealer bool
+type BasicHand struct {
+	Cards  []deck.Card
+	Points int
 }
 
-// Creates a new hand with no cards and 0 points
-func New(isDealer bool) Hand {
-	cards := make([]deck.Card, 0, 9)
-	points := 0
-	return Hand{
-		Cards:    cards,
-		Points:   points,
-		isDealer: isDealer,
+type Player struct {
+	BasicHand
+}
+
+type Dealer struct {
+	BasicHand
+}
+
+func NewPlayer() Player {
+	return Player{
+		BasicHand: BasicHand{
+			Cards:  make([]deck.Card, 0, 9),
+			Points: 0,
+		},
+	}
+}
+
+func NewDealer() Dealer {
+	return Dealer{
+		BasicHand: BasicHand{
+			Cards:  make([]deck.Card, 0, 9),
+			Points: 0,
+		},
 	}
 }
 
 // Adds a card from a deck of cards to the hand; removes
 // the card from the deck to avoid repetition
-func (h *Hand) AddCard(deckOfCards *[]deck.Card) error {
+func (h *BasicHand) AddCard(deckOfCards *[]deck.Card) error {
 	if len(*deckOfCards) == 0 {
 		return fmt.Errorf("the deck is empty")
 	}
@@ -41,7 +52,7 @@ func (h *Hand) AddCard(deckOfCards *[]deck.Card) error {
 // Updates the score of the hand
 // Aces count as either 1 or 11 based on the value of hand; their
 // value is determined last, after the other cards are account for
-func (h *Hand) UpdateScore() {
+func (h *BasicHand) UpdateScore() {
 	h.Points = 0
 	acesCount := 0
 
@@ -62,9 +73,9 @@ func (h *Hand) UpdateScore() {
 }
 
 // Displays the player hand. All cards are always revealed.
-func (h *Hand) DisplayPlayerHand() {
+func (p *Player) DisplayHand() {
 	fmt.Println("Player's Cards:")
-	for _, card := range h.Cards {
+	for _, card := range p.Cards {
 		fmt.Printf("%s ", card)
 	}
 	fmt.Println()
@@ -72,13 +83,13 @@ func (h *Hand) DisplayPlayerHand() {
 
 // Displays the dealer's hand. The second card remains hidden
 // until the final hand, where all the dealer's cards are revealed
-func (h *Hand) DisplayDealerHand(isFinalHand bool) {
+func (d *Dealer) DisplayHand(isFinalHand bool) {
 	fmt.Println("Dealer's Cards:")
-	for i := 0; i < len(h.Cards); i++ {
+	for i := 0; i < len(d.Cards); i++ {
 		if i == 1 && !isFinalHand {
 			fmt.Printf("Hidden Card\n")
 		} else {
-			fmt.Printf("%s ", h.Cards[i])
+			fmt.Printf("%s ", d.Cards[i])
 		}
 	}
 	fmt.Println()
