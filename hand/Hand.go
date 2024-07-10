@@ -66,9 +66,12 @@ func (h *BasicHand) UpdateScore() {
 	acesCount := 0
 
 	for _, card := range h.Cards {
-		if card.Value == deck.Ace {
+		switch card.Value {
+		case deck.Ace:
 			acesCount++
-		} else {
+		case deck.Jack, deck.Queen, deck.King:
+			h.Points += 10
+		default:
 			h.Points += int(card.Value)
 		}
 	}
