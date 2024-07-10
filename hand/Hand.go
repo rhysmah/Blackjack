@@ -60,8 +60,7 @@ func (h *BasicHand) AddCard(deckOfCards *[]deck.Card) error {
 }
 
 // Updates the score of the hand
-// Aces count as either 1 or 11 based on the value of hand; their
-// value is determined last, after the other cards are account for
+// Aces count as either 1 or 11 based on the value of hand
 func (h *BasicHand) UpdateScore() {
 	h.Points = 0
 	acesCount := 0
@@ -82,8 +81,7 @@ func (h *BasicHand) UpdateScore() {
 	}
 }
 
-// Displays player hand.
-// Cards are always revealed.
+// Displays player hand with scores
 func (p *Player) DisplayHand() {
 	fmt.Println("##############")
 	fmt.Println("Player's Cards")
