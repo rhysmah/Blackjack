@@ -10,13 +10,11 @@ import (
 type Suit uint8  // Represents the suit of a card
 type Value uint8 // Represents the value of a card
 
-// Represents a playing card
 type Card struct {
 	Suit  Suit
 	Value Value
 }
 
-// Sorts the deck of cards by suit
 type BySuit []Card
 
 func (a BySuit) Len() int           { return len(a) }
@@ -27,7 +25,6 @@ func SortBySuit(deckOfCards []Card) {
 	sort.Sort(BySuit(deckOfCards))
 }
 
-// Sorts the deck of cards by value
 type ByValue []Card
 
 func (a ByValue) Len() int           { return len(a) }
@@ -152,6 +149,23 @@ func WithMultipleDecks(n int) DeckOptionsFunc {
 	}
 }
 
+func generateDeck(config *DeckOptions) []Card {
+	var deck []Card
+	for i := 0; i < config.numDecks; i++ {
+		for suit := Spades; suit <= Hearts; suit++ {
+			for value := Ace; value <= King; value++ {
+				card := Card{Suit: suit, Value: value}
+
+				// Filter cards (if applicable)
+				if config.filterCard == nil || !config.filterCard(card) {
+					deck = append(deck, card)
+				}
+			}
+		}
+	}
+	return deck
+}
+
 // Creates a complete deck of cards
 func New(opts ...DeckOptionsFunc) []Card {
 	defaultConfig := &DeckOptions{
@@ -167,26 +181,7 @@ func New(opts ...DeckOptionsFunc) []Card {
 	}
 
 	// Create standard deck of cards
-	deckOfCards := []Card{}
-	for suit := Spades; suit <= Hearts; suit++ {
-		for value := Ace; value <= King; value++ {
-			card := Card{Suit: suit, Value: value}
-
-			// Filter cards (if applicable)
-			if defaultConfig.filterCard == nil || !defaultConfig.filterCard(card) {
-				deckOfCards = append(deckOfCards, card)
-			}
-		}
-	}
-
-	// Combine multiple decks (if applicable)
-	if defaultConfig.numDecks > 1 {
-		combinedDeck := make([]Card, 0, len(deckOfCards)*defaultConfig.numDecks)
-		for i := 0; i < defaultConfig.numDecks; i++ {
-			combinedDeck = append(combinedDeck, deckOfCards...)
-		}
-		deckOfCards = combinedDeck
-	}
+	deckOfCards := generateDeck(defaultConfig)
 
 	// Add Jokers (if applicable)
 	for i := 0; i < defaultConfig.numJokers; i++ {
