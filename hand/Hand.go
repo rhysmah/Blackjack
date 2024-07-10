@@ -85,11 +85,14 @@ func (h *BasicHand) UpdateScore() {
 // Displays player hand.
 // Cards are always revealed.
 func (p *Player) DisplayHand() {
-	fmt.Println("Player's Cards:")
+	fmt.Println("##############")
+	fmt.Println("Player's Cards")
+	fmt.Println("##############")
 	for _, card := range p.Cards {
-		fmt.Printf("%s ", card)
+		fmt.Printf("%s\n", card)
 	}
-	fmt.Println()
+	p.UpdateScore()
+	fmt.Printf("Score: %d\n", p.Points)
 	fmt.Println()
 }
 
@@ -104,13 +107,19 @@ func (d *Dealer) DisplayHand(opts ...ConfigDealerOptsFunc) {
 		opt(defConfig)
 	}
 
-	fmt.Println("Dealer's Cards:")
+	fmt.Println("##############")
+	fmt.Println("Dealer's Cards")
+	fmt.Println("##############")
 	for i := 0; i < len(d.Cards); i++ {
 		if i == 1 && !defConfig.isFinalHand {
 			fmt.Printf("Hidden Card\n")
 		} else {
-			fmt.Printf("%s ", d.Cards[i])
+			fmt.Printf("%s\n", d.Cards[i])
 		}
+	}
+	d.UpdateScore()
+	if defConfig.isFinalHand {
+		fmt.Printf("Score: %d\n", d.Points)
 	}
 	fmt.Println()
 }
