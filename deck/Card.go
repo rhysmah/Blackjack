@@ -7,8 +7,8 @@ import (
 	"sort"
 )
 
-type Suit int
-type Value int
+type Suit int  // Suit of card
+type Value int // Face value of card
 
 type Card struct {
 	Suit  Suit
@@ -60,8 +60,7 @@ const (
 	King                    // value 13
 )
 
-// Maps for the string representation of the suit and value
-// Allows for readable output when printing a card, e.g. "Ace of Spades" instead of {0, 0}
+// Map converts card suit int to string for readability
 var suits = map[Suit]string{
 	0: "Spades",
 	1: "Diamonds",
@@ -70,6 +69,7 @@ var suits = map[Suit]string{
 	4: "Joker",
 }
 
+// Map converts card value int to string for readability
 var values = map[Value]string{
 	1:  "Ace",
 	2:  "Two",
@@ -86,7 +86,7 @@ var values = map[Value]string{
 	13: "King",
 }
 
-// String() is a special method that's called whenever a print function is used
+// String() is a special method called whenever a print function is used
 func (c Card) String() string {
 	switch {
 	case c.Suit == JokerSuit:
@@ -100,7 +100,7 @@ func (c Card) String() string {
 	}
 }
 
-// Configuration options for a deck of cards
+// Configuration options for deck of cards
 type Options struct {
 	sortFunc   func([]Card)
 	shuffle    bool
@@ -109,11 +109,11 @@ type Options struct {
 	numDecks   int
 }
 
-// Function that takes in a pointer to a DeckOptions struct and modifies it
-// This allows for the creation of a deck of cards with different configurations
+// Function that takes in a pointer to an Options struct and modifies it
+// Allows for creation of a deck of cards with different configurations
 type OptionsFunc func(deckOpts *Options) error
 
-// Determines how a deck of cards should be sorted
+// Determines how to sort a deck of cards: by value or by suit
 func WithSort(sortFunc func([]Card)) OptionsFunc {
 	return func(DeckOpts *Options) error {
 		DeckOpts.sortFunc = sortFunc
@@ -129,8 +129,7 @@ func WithShuffle() OptionsFunc {
 	}
 }
 
-// Determines if a deck of cards should be filtered
-// Decks can be filtered by suit, value, or both
+// Determines if a deck of cards should be filtered: by suit, value or both
 func WithFilteredCards(filterFunc func(card Card) bool) OptionsFunc {
 	return func(deckOpts *Options) error {
 		deckOpts.filterCard = filterFunc
@@ -138,7 +137,7 @@ func WithFilteredCards(filterFunc func(card Card) bool) OptionsFunc {
 	}
 }
 
-// Determines how many jokers should be added to a deck of cards
+// Determines how many jokers should be added to card deck
 func WithJokers(n int) OptionsFunc {
 	return func(deckOpts *Options) error {
 		if n < 0 {
@@ -160,6 +159,7 @@ func WithMultipleDecks(n int) OptionsFunc {
 	}
 }
 
+// Generates a deck of cards
 func generateDeck(config *Options) []Card {
 	var deck []Card
 	for i := 0; i < config.numDecks; i++ {
@@ -176,7 +176,7 @@ func generateDeck(config *Options) []Card {
 	return deck
 }
 
-// Creates a complete deck of cards
+// Creates a new deck of cards with specific configurations
 func New(opts ...OptionsFunc) []Card {
 	defaultConfig := &Options{
 		sortFunc:   nil,
