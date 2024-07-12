@@ -177,7 +177,7 @@ func generateDeck(config *Options) []Card {
 }
 
 // Creates a new deck of cards with specific configurations
-func New(opts ...OptionsFunc) []Card {
+func New(opts ...OptionsFunc) ([]Card, error) {
 	defaultConfig := &Options{
 		sortFunc:   nil,
 		shuffle:    false,
@@ -187,6 +187,9 @@ func New(opts ...OptionsFunc) []Card {
 	}
 
 	for _, opt := range opts {
+		if err := opt(defaultConfig); err != nil {
+			return nil, err
+		}
 		opt(defaultConfig)
 	}
 
@@ -202,9 +205,10 @@ func New(opts ...OptionsFunc) []Card {
 		defaultConfig.sortFunc(deckOfCards)
 	}
 	log.Println("Successfully created deck of cards")
-	return deckOfCards
+	return deckOfCards, nil
 }
 
+// Shuffles a deck of cards
 func shuffle(deckOfCards []Card) {
 	rand.Shuffle(len(deckOfCards), func(i, j int) {
 		deckOfCards[i], deckOfCards[j] = deckOfCards[j], deckOfCards[i]
