@@ -87,7 +87,10 @@ func endGame(bust, blackjack bool, player hand.Player, dealer hand.Dealer) {
 }
 
 func main() {
-	deck := deck.New(deck.WithShuffle())
+	deck, err := deck.New(deck.WithShuffle())
+	if err != nil {
+		panic(err)
+	}
 	player := hand.NewPlayer()
 	dealer := hand.NewDealer()
 

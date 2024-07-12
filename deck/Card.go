@@ -2,9 +2,6 @@ package deck
 
 import (
 	"fmt"
-	"log"
-	"math/rand"
-	"sort"
 )
 
 type Suit int  // Suit of card
@@ -13,26 +10,6 @@ type Value int // Face value of card
 type Card struct {
 	Suit  Suit
 	Value Value
-}
-
-type BySuit []Card
-
-func (a BySuit) Len() int           { return len(a) }
-func (a BySuit) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a BySuit) Less(i, j int) bool { return a[i].Suit < a[j].Suit }
-
-func SortBySuit(deckOfCards []Card) {
-	sort.Sort(BySuit(deckOfCards))
-}
-
-type ByValue []Card
-
-func (a ByValue) Len() int           { return len(a) }
-func (a ByValue) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByValue) Less(i, j int) bool { return a[i].Value < a[j].Value }
-
-func SortByValue(deckOfCards []Card) {
-	sort.Sort(ByValue(deckOfCards))
 }
 
 const (
@@ -98,119 +75,4 @@ func (c Card) String() string {
 	default:
 		return fmt.Sprintf("%s of %s", values[c.Value], suits[c.Suit])
 	}
-}
-
-// Configuration options for deck of cards
-type Options struct {
-	sortFunc   func([]Card)
-	shuffle    bool
-	filterCard func(card Card) bool
-	numJokers  int
-	numDecks   int
-}
-
-// Function that takes in a pointer to an Options struct and modifies it
-// Allows for creation of a deck of cards with different configurations
-type OptionsFunc func(deckOpts *Options) error
-
-// Determines how to sort a deck of cards: by value or by suit
-func WithSort(sortFunc func([]Card)) OptionsFunc {
-	return func(DeckOpts *Options) error {
-		DeckOpts.sortFunc = sortFunc
-		return nil
-	}
-}
-
-// Determines if a deck of cards should be shuffled
-func WithShuffle() OptionsFunc {
-	return func(deckOpts *Options) error {
-		deckOpts.shuffle = true
-		return nil
-	}
-}
-
-// Determines if a deck of cards should be filtered: by suit, value or both
-func WithFilteredCards(filterFunc func(card Card) bool) OptionsFunc {
-	return func(deckOpts *Options) error {
-		deckOpts.filterCard = filterFunc
-		return nil
-	}
-}
-
-// Determines how many jokers should be added to card deck
-func WithJokers(n int) OptionsFunc {
-	return func(deckOpts *Options) error {
-		if n < 0 {
-			return fmt.Errorf("number of jokers cannot be negative: %d", n)
-		}
-		deckOpts.numJokers = n
-		return nil
-	}
-}
-
-// Determines how many decks should be combined to create a deck of cards
-func WithMultipleDecks(n int) OptionsFunc {
-	return func(deckOpts *Options) error {
-		if n < 0 {
-			return fmt.Errorf("number of decks cannot be negative: %d", n)
-		}
-		deckOpts.numDecks = n
-		return nil
-	}
-}
-
-// Generates a deck of cards
-func generateDeck(config *Options) []Card {
-	var deck []Card
-	for i := 0; i < config.numDecks; i++ {
-		for suit := Spades; suit <= Hearts; suit++ {
-			for value := Ace; value <= King; value++ {
-				card := Card{Suit: suit, Value: value}
-
-				if config.filterCard == nil || !config.filterCard(card) {
-					deck = append(deck, card)
-				}
-			}
-		}
-	}
-	return deck
-}
-
-// Creates a new deck of cards with specific configurations
-func New(opts ...OptionsFunc) ([]Card, error) {
-	defaultConfig := &Options{
-		sortFunc:   nil,
-		shuffle:    false,
-		filterCard: nil,
-		numJokers:  0,
-		numDecks:   1,
-	}
-
-	for _, opt := range opts {
-		if err := opt(defaultConfig); err != nil {
-			return nil, err
-		}
-		opt(defaultConfig)
-	}
-
-	deckOfCards := generateDeck(defaultConfig)
-
-	for i := 0; i < defaultConfig.numJokers; i++ {
-		deckOfCards = append(deckOfCards, Card{Suit: JokerSuit, Value: JokerValue})
-	}
-	if defaultConfig.shuffle {
-		shuffle(deckOfCards)
-	}
-	if defaultConfig.sortFunc != nil {
-		defaultConfig.sortFunc(deckOfCards)
-	}
-	log.Println("Successfully created deck of cards")
-	return deckOfCards, nil
-}
-
-// Shuffles a deck of cards
-func shuffle(deckOfCards []Card) {
-	rand.Shuffle(len(deckOfCards), func(i, j int) {
-		deckOfCards[i], deckOfCards[j] = deckOfCards[j], deckOfCards[i]
-	})
 }
