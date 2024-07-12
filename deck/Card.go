@@ -101,7 +101,7 @@ func (c Card) String() string {
 }
 
 // Configuration options for a deck of cards
-type DeckOptions struct {
+type Options struct {
 	sortFunc   func([]Card)
 	shuffle    bool
 	filterCard func(card Card) bool
@@ -111,45 +111,56 @@ type DeckOptions struct {
 
 // Function that takes in a pointer to a DeckOptions struct and modifies it
 // This allows for the creation of a deck of cards with different configurations
-type DeckOptionsFunc func(deckOpts *DeckOptions)
+type OptionsFunc func(deckOpts *Options) error
 
 // Determines how a deck of cards should be sorted
-func WithSort(sortFunc func([]Card)) DeckOptionsFunc {
-	return func(DeckOpts *DeckOptions) {
+func WithSort(sortFunc func([]Card)) OptionsFunc {
+	return func(DeckOpts *Options) error {
 		DeckOpts.sortFunc = sortFunc
+		return nil
 	}
 }
 
 // Determines if a deck of cards should be shuffled
-func WithShuffle() DeckOptionsFunc {
-	return func(deckOpts *DeckOptions) {
+func WithShuffle() OptionsFunc {
+	return func(deckOpts *Options) error {
 		deckOpts.shuffle = true
+		return nil
 	}
 }
 
 // Determines if a deck of cards should be filtered
 // Decks can be filtered by suit, value, or both
-func WithFilteredCards(filterFunc func(card Card) bool) DeckOptionsFunc {
-	return func(deckOpts *DeckOptions) {
+func WithFilteredCards(filterFunc func(card Card) bool) OptionsFunc {
+	return func(deckOpts *Options) error {
 		deckOpts.filterCard = filterFunc
+		return nil
 	}
 }
 
 // Determines how many jokers should be added to a deck of cards
-func WithJokers(n int) DeckOptionsFunc {
-	return func(deckOpts *DeckOptions) {
+func WithJokers(n int) OptionsFunc {
+	return func(deckOpts *Options) error {
+		if n < 0 {
+			return fmt.Errorf("number of jokers cannot be negative: %d", n)
+		}
 		deckOpts.numJokers = n
+		return nil
 	}
 }
 
 // Determines how many decks should be combined to create a deck of cards
-func WithMultipleDecks(n int) DeckOptionsFunc {
-	return func(deckOpts *DeckOptions) {
+func WithMultipleDecks(n int) OptionsFunc {
+	return func(deckOpts *Options) error {
+		if n < 0 {
+			return fmt.Errorf("number of decks cannot be negative: %d", n)
+		}
 		deckOpts.numDecks = n
+		return nil
 	}
 }
 
-func generateDeck(config *DeckOptions) []Card {
+func generateDeck(config *Options) []Card {
 	var deck []Card
 	for i := 0; i < config.numDecks; i++ {
 		for suit := Spades; suit <= Hearts; suit++ {
@@ -166,8 +177,8 @@ func generateDeck(config *DeckOptions) []Card {
 }
 
 // Creates a complete deck of cards
-func New(opts ...DeckOptionsFunc) []Card {
-	defaultConfig := &DeckOptions{
+func New(opts ...OptionsFunc) []Card {
+	defaultConfig := &Options{
 		sortFunc:   nil,
 		shuffle:    false,
 		filterCard: nil,
