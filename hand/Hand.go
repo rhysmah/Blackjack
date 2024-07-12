@@ -1,12 +1,12 @@
 package hand
 
 import (
-	"blackjack/deck"
+	"blackjack/carddeck"
 	"fmt"
 )
 
 type BasicHand struct {
-	Cards  []deck.Card
+	Cards  []carddeck.Card
 	Points int
 }
 
@@ -21,7 +21,7 @@ type Dealer struct {
 func NewPlayer() Player {
 	return Player{
 		BasicHand: BasicHand{
-			Cards:  make([]deck.Card, 0, 9),
+			Cards:  make([]carddeck.Card, 0, 9),
 			Points: 0,
 		},
 	}
@@ -30,7 +30,7 @@ func NewPlayer() Player {
 func NewDealer() Dealer {
 	return Dealer{
 		BasicHand: BasicHand{
-			Cards:  make([]deck.Card, 0, 9),
+			Cards:  make([]carddeck.Card, 0, 9),
 			Points: 0,
 		},
 	}
@@ -50,7 +50,7 @@ func IsFinalHand() ConfigDealerOptsFunc {
 
 // Adds a card from a deck of cards to a hand;
 // removes card from deck to avoid repetition
-func (h *BasicHand) AddCard(deckOfCards *[]deck.Card) error {
+func (h *BasicHand) AddCard(deckOfCards *[]carddeck.Card) error {
 	if len(*deckOfCards) == 0 {
 		return fmt.Errorf("the deck is empty")
 	}
@@ -67,9 +67,9 @@ func (h *BasicHand) UpdateScore() {
 
 	for _, card := range h.Cards {
 		switch card.Value {
-		case deck.Ace:
+		case carddeck.Ace:
 			acesCount++
-		case deck.Jack, deck.Queen, deck.King:
+		case carddeck.Jack, carddeck.Queen, carddeck.King:
 			h.Points += 10
 		default:
 			h.Points += int(card.Value)

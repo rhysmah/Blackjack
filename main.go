@@ -1,21 +1,21 @@
 package main
 
 import (
-	"blackjack/deck"
+	"blackjack/carddeck"
 	"blackjack/hand"
 	"fmt"
 	"strings"
 )
 
-type CommandFunc func(deck *[]deck.Card, player *hand.Player)
+type CommandFunc func(deck *[]carddeck.Card, player *hand.Player)
 
 // Player adds a card to their hand
-func hit(deck *[]deck.Card, player *hand.Player) {
+func hit(deck *[]carddeck.Card, player *hand.Player) {
 	player.AddCard(deck)
 }
 
 // Play stays; nothing happens
-func stay(deck *[]deck.Card, player *hand.Player) {
+func stay(deck *[]carddeck.Card, player *hand.Player) {
 }
 
 // Gets the user's input; returns a string trimmed of whitespace
@@ -29,7 +29,7 @@ func getUserOption() string {
 // Gameplay loop that asks the player to hit or stay.
 // If the player busts (> 21) or gets blackjack (== 21), the loop ends.
 // If the player stays, the loop ends
-func play(deck *[]deck.Card, dealer *hand.Dealer, player *hand.Player) (bool, bool) {
+func play(deck *[]carddeck.Card, dealer *hand.Dealer, player *hand.Player) (bool, bool) {
 	playerOptions := map[string]CommandFunc{
 		"1": hit,
 		"2": stay,
@@ -61,7 +61,7 @@ func play(deck *[]deck.Card, dealer *hand.Dealer, player *hand.Player) (bool, bo
 }
 
 // Deals the player and dealer two cards each
-func dealInitialHands(deck *[]deck.Card, playerHand, dealerHand *hand.BasicHand) {
+func dealInitialHands(deck *[]carddeck.Card, playerHand, dealerHand *hand.BasicHand) {
 	for i := 0; i < 2; i++ {
 		playerHand.AddCard(deck)
 		dealerHand.AddCard(deck)
@@ -87,7 +87,7 @@ func endGame(bust, blackjack bool, player hand.Player, dealer hand.Dealer) {
 }
 
 func main() {
-	deck, err := deck.New(deck.WithShuffle())
+	deck, err := carddeck.New(carddeck.WithShuffle())
 	if err != nil {
 		panic(err)
 	}
