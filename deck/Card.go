@@ -7,8 +7,8 @@ import (
 	"sort"
 )
 
-type Suit uint8
-type Value uint8
+type Suit int
+type Value int
 
 type Card struct {
 	Suit  Suit
