@@ -10,16 +10,16 @@ type BasicHand struct {
 	Points int
 }
 
-type Player struct {
+type PlayerHand struct {
 	BasicHand
 }
 
-type Dealer struct {
+type DealerHand struct {
 	BasicHand
 }
 
-func NewPlayer() Player {
-	return Player{
+func NewPlayer() PlayerHand {
+	return PlayerHand{
 		BasicHand: BasicHand{
 			Cards:  make([]carddeck.Card, 0, 9),
 			Points: 0,
@@ -27,8 +27,8 @@ func NewPlayer() Player {
 	}
 }
 
-func NewDealer() Dealer {
-	return Dealer{
+func NewDealer() DealerHand {
+	return DealerHand{
 		BasicHand: BasicHand{
 			Cards:  make([]carddeck.Card, 0, 9),
 			Points: 0,
@@ -48,8 +48,7 @@ func IsFinalHand() ConfigDealerOptsFunc {
 	}
 }
 
-// Adds a card from a deck of cards to a hand;
-// removes card from deck to avoid repetition
+// Add card from deck to hand
 func (h *BasicHand) AddCard(deckOfCards *[]carddeck.Card) error {
 	if len(*deckOfCards) == 0 {
 		return fmt.Errorf("the deck is empty")
@@ -59,9 +58,8 @@ func (h *BasicHand) AddCard(deckOfCards *[]carddeck.Card) error {
 	return nil
 }
 
-// Updates the score of the hand
-// Aces count as either 1 or 11 based on the value of hand
-func (h *BasicHand) UpdateScore() {
+// Update hand score; aces count as either 1 or 11 based on hand value
+func (h *BasicHand) CalculateScore() {
 	h.Points = 0
 	acesCount := 0
 
@@ -85,25 +83,24 @@ func (h *BasicHand) UpdateScore() {
 }
 
 // Displays player hand with scores
-func (p *Player) DisplayHand() {
+func (p *PlayerHand) DisplayHand() {
 	fmt.Println("##############")
 	fmt.Println("Player's Cards")
 	fmt.Println("##############")
 	for _, card := range p.Cards {
 		fmt.Printf("%s\n", card)
 	}
-	p.UpdateScore()
+	p.CalculateScore()
 	fmt.Printf("Score: %d\n", p.Points)
 	fmt.Println()
 }
 
 // Displays dealer's hand. Second card remains hidden
 // until the final hand, where all cards are revealed
-func (d *Dealer) DisplayHand(opts ...ConfigDealerOptsFunc) {
+func (d *DealerHand) DisplayHand(opts ...ConfigDealerOptsFunc) {
 	defConfig := &ConfigDealerOpts{
 		isFinalHand: false,
 	}
-
 	for _, opt := range opts {
 		opt(defConfig)
 	}
@@ -118,7 +115,7 @@ func (d *Dealer) DisplayHand(opts ...ConfigDealerOptsFunc) {
 			fmt.Printf("%s\n", d.Cards[i])
 		}
 	}
-	d.UpdateScore()
+	d.CalculateScore()
 	if defConfig.isFinalHand {
 		fmt.Printf("Score: %d\n", d.Points)
 	}

@@ -7,16 +7,20 @@ import (
 	"strings"
 )
 
-type CommandFunc func(deck *[]carddeck.Card, player *hand.Player)
+const (
+	HitOption  = "1"
+	StayOption = "2"
+)
+
+type CommandFunc func(deck *[]carddeck.Card, player *hand.PlayerHand)
 
 // Player adds a card to their hand
-func hit(deck *[]carddeck.Card, player *hand.Player) {
+func hit(deck *[]carddeck.Card, player *hand.PlayerHand) {
 	player.AddCard(deck)
 }
 
 // Play stays; nothing happens
-func stay(deck *[]carddeck.Card, player *hand.Player) {
-}
+func stay(deck *[]carddeck.Card, player *hand.PlayerHand) {}
 
 // Gets the user's input; returns a string trimmed of whitespace
 func getUserOption() string {
@@ -26,23 +30,49 @@ func getUserOption() string {
 	return strings.TrimSpace(userChoice)
 }
 
-// Gameplay loop that asks the player to hit or stay.
-// If the player busts (> 21) or gets blackjack (== 21), the loop ends.
-// If the player stays, the loop ends
-func play(deck *[]carddeck.Card, dealer *hand.Dealer, player *hand.Player) (bool, bool) {
+func checkWinConditions(player *hand.PlayerHand, dealer *hand.DealerHand) (bool, bool, bool) {
+	switch {
+	case player.Points > 21:
+		return false, true, false // player busts, dealer wins
+	case dealer.Points > 21:
+		return true, false, false // player wins, dealer busts
+	case player.Points == 21 && len(player.Cards) == 2 && dealer.Points == 21 && len(dealer.Cards) == 2:
+		return false, false, true // tie: player and dealer both get blackjack
+	case player.Points == 21 && len(player.Cards) == 2:
+		return true, false, false // player wins with blackjack
+	case dealer.Points == 21 && len(dealer.Cards) == 2:
+		return false, true, false // dealer wins with blackjack
+	default:
+		return false, false, false // Nobody wins yet
+	}
+}
+
+func checkFinalWinConditions(player *hand.PlayerHand, dealer *hand.DealerHand) (bool, bool, bool) {
+	switch {
+	case player.Points > dealer.Points:
+		return true, false, false // player wins
+	case player.Points < dealer.Points:
+		return false, true, false // dealer wins
+	default:
+		return false, false, true // tie: dealer and player both have non-blackjack 21
+	}
+}
+
+// Plays the game
+func play(deck *[]carddeck.Card, dealer *hand.DealerHand, player *hand.PlayerHand) (bool, bool, bool) {
 	playerOptions := map[string]CommandFunc{
-		"1": hit,
-		"2": stay,
+		HitOption:  hit,
+		StayOption: stay,
 	}
 
+	// Gameplay loop
 	for {
-		player.UpdateScore()
+		player.CalculateScore()
+		dealer.CalculateScore()
 
-		if player.Points > 21 {
-			return true, false
-		}
-		if player.Points == 21 {
-			return false, true
+		playerWin, dealerWin, tie := checkWinConditions(player, dealer)
+		if playerWin || dealerWin || tie {
+			return playerWin, dealerWin, tie
 		}
 
 		player.DisplayHand()
@@ -57,47 +87,34 @@ func play(deck *[]carddeck.Card, dealer *hand.Dealer, player *hand.Player) (bool
 		}
 		fmt.Println("Invalid selection. Select 1 (hit) or 2 (stay)")
 	}
-	return false, false
-}
 
-// Deals the player and dealer two cards each
-func dealInitialHands(deck *[]carddeck.Card, playerHand, dealerHand *hand.BasicHand) {
-	for i := 0; i < 2; i++ {
-		playerHand.AddCard(deck)
-		dealerHand.AddCard(deck)
-	}
+	player.CalculateScore()
+	dealer.CalculateScore()
+
+	return checkFinalWinConditions(player, dealer)
 }
 
 // Displays the dealer's and player's hands and checks for a winner
-func endGame(bust, blackjack bool, player hand.Player, dealer hand.Dealer) {
+func endGame(playerWins, dealerWins, tie bool, player hand.PlayerHand, dealer hand.DealerHand) {
+
 	player.DisplayHand()
 	dealer.DisplayHand(hand.IsFinalHand())
 
-	if bust {
-		fmt.Println("You bust! Dealer wins.")
-	} else if blackjack {
-		fmt.Println("You got blackjack! You win.")
-	} else if player.Points > dealer.Points {
-		fmt.Println("You got the higher score. You win.")
-	} else if player.Points < dealer.Points {
-		fmt.Println("The dealer got the higher score. You lose.")
-	} else {
-		fmt.Println("Tie! Nobody wins.")
+	switch {
+	case playerWins:
+		fmt.Println("You win!")
+	case dealerWins:
+		fmt.Println("Dealer wins!")
+	case tie:
+		fmt.Println("It's a tie!")
 	}
 }
 
 func main() {
-	deck, err := carddeck.New(carddeck.WithShuffle())
+	game, err := hand.NewGame()
 	if err != nil {
 		panic(err)
 	}
-	player := hand.NewPlayer()
-	dealer := hand.NewDealer()
-
-	dealInitialHands(&deck, &player.BasicHand, &dealer.BasicHand)
-
-	// Gameplay loop
-	bust, blackjack := play(&deck, &dealer, &player)
-
-	endGame(bust, blackjack, player, dealer)
+	playerWins, dealerWins, tie := play(&game.DeckOfCards, &game.Dealer, &game.Player)
+	endGame(playerWins, dealerWins, tie, game.Player, game.Dealer)
 }
