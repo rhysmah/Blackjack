@@ -4,8 +4,9 @@ import (
 	"fmt"
 )
 
-type Suit int  // Suit of card
-type Value int // Face value of card
+// The suit of card (Spades, Diamonds, Clubs, Hearts, and Jokers )
+type Suit int
+type Value int
 
 type Card struct {
 	Suit  Suit
@@ -13,11 +14,11 @@ type Card struct {
 }
 
 const (
-	Spades    Suit = iota // value 0
-	Diamonds              // value 1
-	Clubs                 // value 2
-	Hearts                // value 3
-	JokerSuit             // value 4
+	Spades   Suit = iota // value 0
+	Diamonds             // value 1
+	Clubs                // value 2
+	Hearts               // value 3
+	Joker                // value 4
 )
 
 const (
@@ -66,7 +67,7 @@ var values = map[Value]string{
 // String() is a special method called whenever a print function is used
 func (c Card) String() string {
 	switch {
-	case c.Suit == JokerSuit:
+	case c.Suit == Joker:
 		return fmt.Sprint(suits[c.Suit])
 	case c.Value < Ace || c.Value > King:
 		return fmt.Sprintf("invalid card value: %d", c.Value)

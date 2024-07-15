@@ -42,7 +42,7 @@ func New(opts ...OptionsFunc) ([]Card, error) {
 	deckOfCards := generateDeck(defaultConfig)
 
 	for i := 0; i < defaultConfig.numJokers; i++ {
-		deckOfCards = append(deckOfCards, Card{Suit: JokerSuit, Value: JokerValue})
+		deckOfCards = append(deckOfCards, Card{Suit: Joker, Value: JokerValue})
 	}
 	if defaultConfig.shuffle {
 		shuffle(deckOfCards)
