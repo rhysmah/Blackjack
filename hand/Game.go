@@ -5,6 +5,9 @@ import (
 	"fmt"
 )
 
+// TODO: add Pot element and  methods to Game to
+// handle betting: PlaceBet(), WinBet(), ClearPot()
+
 type Game struct {
 	DeckOfCards []carddeck.Card
 	Player      PlayerHand
