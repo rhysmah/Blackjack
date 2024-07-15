@@ -4,13 +4,13 @@ import (
 	"fmt"
 )
 
-// The suit of card:Spades, Diamonds, Clubs, Hearts, and Jokers
+// The suit of card: Spades, Diamonds, Clubs, Hearts, and Jokers
 type Suit int
 
 // The value of a card: Joker (0) to King (13)
 type Value int
 
-// Card represents a playing card, with a suit and a value
+// Card represents a playing card, comprised of a suit and a value
 type Card struct {
 	Suit  Suit
 	Value Value
