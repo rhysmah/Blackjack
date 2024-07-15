@@ -8,6 +8,7 @@ import (
 type BasicHand struct {
 	Cards  []carddeck.Card
 	Points int
+	Money  float64
 }
 
 type PlayerHand struct {
@@ -18,22 +19,60 @@ type DealerHand struct {
 	BasicHand
 }
 
-func NewPlayer() PlayerHand {
+type ConfigOpts struct {
+	startingAmount float64
+}
+
+type ConfigOptsFunc func(opts *ConfigOpts) error
+
+func WithStartingAmount(startingAmount float64) ConfigOptsFunc {
+	return func(opts *ConfigOpts) error {
+		if startingAmount <= 0.0 {
+			return fmt.Errorf("starting amount must be greater than 0.0")
+		}
+		opts.startingAmount = startingAmount
+		return nil
+	}
+}
+
+func NewPlayer(opts ...ConfigOptsFunc) (PlayerHand, error) {
+	config := &ConfigOpts{
+		startingAmount: 0.0,
+	}
+
+	for _, opt := range opts {
+		if err := opt(config); err != nil {
+			return PlayerHand{}, err
+		}
+	}
+
 	return PlayerHand{
 		BasicHand: BasicHand{
 			Cards:  make([]carddeck.Card, 0, 9),
 			Points: 0,
+			Money:  config.startingAmount,
 		},
-	}
+	}, nil
 }
 
-func NewDealer() DealerHand {
+func NewDealer(opts ...ConfigOptsFunc) (DealerHand, error) {
+	config := &ConfigOpts{
+		startingAmount: 0,
+	}
+
+	for _, opt := range opts {
+		if err := opt(config); err != nil {
+			return DealerHand{}, err
+		}
+	}
+
 	return DealerHand{
 		BasicHand: BasicHand{
 			Cards:  make([]carddeck.Card, 0, 9),
 			Points: 0,
+			Money:  config.startingAmount,
 		},
-	}
+	}, nil
 }
 
 type ConfigDealerOpts struct {
@@ -92,6 +131,7 @@ func (p *PlayerHand) DisplayHand() {
 	}
 	p.CalculateScore()
 	fmt.Printf("Score: %d\n", p.Points)
+	fmt.Printf("Money: %f\n", p.Money)
 	fmt.Println()
 }
 
@@ -118,6 +158,7 @@ func (d *DealerHand) DisplayHand(opts ...ConfigDealerOptsFunc) {
 	d.CalculateScore()
 	if defConfig.isFinalHand {
 		fmt.Printf("Score: %d\n", d.Points)
+		fmt.Printf("Money: %f\n", d.Money)
 	}
 	fmt.Println()
 }

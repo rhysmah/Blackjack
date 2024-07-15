@@ -1,6 +1,9 @@
 package hand
 
-import "blackjack/carddeck"
+import (
+	"blackjack/carddeck"
+	"fmt"
+)
 
 type Game struct {
 	DeckOfCards []carddeck.Card
@@ -14,10 +17,20 @@ func NewGame() (*Game, error) {
 		return nil, err
 	}
 
+	player, err := NewPlayer(WithStartingAmount(100.00))
+	if err != nil {
+		return nil, fmt.Errorf("error creating player: %w", err)
+	}
+
+	dealer, err := NewDealer(WithStartingAmount(100.00))
+	if err != nil {
+		return nil, fmt.Errorf("error creating dealer: %w", err)
+	}
+
 	game := &Game{
 		DeckOfCards: deckOfCards,
-		Player:      NewPlayer(),
-		Dealer:      NewDealer(),
+		Player:      player,
+		Dealer:      dealer,
 	}
 
 	for i := 0; i < 2; i++ {
