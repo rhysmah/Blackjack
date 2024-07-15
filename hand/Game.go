@@ -1,6 +1,6 @@
 package hand
 
-import carddeck "blackjack/carddeck"
+import "blackjack/carddeck"
 
 type Game struct {
 	DeckOfCards []carddeck.Card
