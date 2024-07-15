@@ -4,10 +4,13 @@ import (
 	"fmt"
 )
 
-// The suit of card (Spades, Diamonds, Clubs, Hearts, and Jokers )
+// The suit of card:Spades, Diamonds, Clubs, Hearts, and Jokers
 type Suit int
+
+// The value of a card: Joker (0) to King (13)
 type Value int
 
+// Card represents a playing card, with a suit and a value
 type Card struct {
 	Suit  Suit
 	Value Value
@@ -38,7 +41,8 @@ const (
 	King                    // value 13
 )
 
-// Map converts card suit int to string for readability
+// suits maps a Suit, an integer, to a string
+// representation of a card's suit.
 var suits = map[Suit]string{
 	0: "Spades",
 	1: "Diamonds",
@@ -47,7 +51,8 @@ var suits = map[Suit]string{
 	4: "Joker",
 }
 
-// Map converts card value int to string for readability
+// values maps a Value, an integer, to a string
+// representation of a card's value.
 var values = map[Value]string{
 	1:  "Ace",
 	2:  "Two",
@@ -64,7 +69,8 @@ var values = map[Value]string{
 	13: "King",
 }
 
-// String() is a special method called whenever a print function is used
+// String() is a special method called whenever a print function is used.
+// It prints a simple representation of a playing card, e.g., "Ace of Hearts"
 func (c Card) String() string {
 	switch {
 	case c.Suit == Joker:
